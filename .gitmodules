@@ -1,3 +1,6 @@
 [submodule "contiki-ng"]
 	path = contiki-ng
 	url = https://github.com/contiki-ng/contiki-ng.git
+[submodule "libjss"]
+	path = libjss
+	url = https://github.com/SUASec/libjss.git
