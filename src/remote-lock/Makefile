@@ -1,5 +1,6 @@
 
-CONTIKI=../../../../..
+CONTIKI=../../contiki-ng
+
 # Include CoAP resources
 MODULES_REL += ./resources
 CONTIKI_PROJECT = remote-lock

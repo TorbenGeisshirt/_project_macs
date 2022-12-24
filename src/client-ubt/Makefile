@@ -1,5 +1,5 @@
 
-CONTIKI=../../../../..
+CONTIKI=../../contiki-ng
 CONTIKI_PROJECT = client-ubt
 
 all: $(CONTIKI_PROJECT)
