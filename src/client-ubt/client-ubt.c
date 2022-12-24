@@ -56,8 +56,8 @@ PROCESS_THREAD(client_ubt, ev, data)
         "Server address:"
         );
 
-    //LOG_INFO_COAP_EP(&remote_ep);
-    //LOG_INFO_("\n");
+    LOG_INFO_COAP_EP(&remote_ep);
+    LOG_INFO_("\n");
 
     if (coap_endpoint_is_secure(&remote_ep))
         puts("Confidentiality is protected by DTLS");
