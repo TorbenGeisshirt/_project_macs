@@ -1,6 +1,9 @@
 
 CONTIKI=../../contiki-ng
-CONTIKI_PROJECT = client-ubt
+
+# Include CoAP resources
+# MODULES_REL += ../_resources
+CONTIKI_PROJECT = rm-buzzer
 
 all: $(CONTIKI_PROJECT)
 

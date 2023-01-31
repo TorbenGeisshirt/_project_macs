@@ -1,12 +1,17 @@
 
-#ifndef CLIENT_UBT_H_
-#define CLIENT_UBT_H_
+#ifndef CLI_BUZZER_H_
+#define CLI_BUZZER_H_
 
 #include <string.h>
 
 // Contiki
 #include "contiki.h"
+#include "contiki-net.h"
+
+//CoAP
 #include "coap-engine.h"
+#include "coap-blocking-api.h"
+#include "coap-callback-api.h"
 
 // LWM
 #ifdef COAP_DTLS_KEYSTORE_CONF_WITH_LWM2M
@@ -18,13 +23,16 @@
 // Logging
 #include "coap-log.h"
 
+// Timer
+#include "sys/etimer.h"
+
 #define LOG_MODULE "App"
-#define LOG_LEVEL LOG_LEVEL_DBG
+#define LOG_LEVEL LOG_LEVEL_COAP
 
 #ifdef WITH_DTLS
-    #define REMOTE_EP "coaps://[fe80::212:4b00:abcd:ef00]"
+    #define REMOTE_BUZZ_EP "coaps://[fe80::212:4b00:abcd:ef01]"
 #else
-    #define REMOTE_EP "coap://[fe80::212:4b00:abcd:ef00]"
+    #define REMOTE_BUZZ_EP "coap://[fe80::212:4b00:abcd:ef01]"
 #endif
 
 #define NUMBER_OF_URLS 4
@@ -35,23 +43,23 @@
     #define REQUEST_INTERVAL 5
 #endif
 
+static struct etimer timer;
 
 char *remote_urls[NUMBER_OF_URLS] =
 {
     ".well-known/core",
-    "reed",
-    "lock/open",
-    "buzzer/toggle"
+    
+    "buzz/sound",
+    "buzz/alarm",
+    "buzz/reset",
 };
-
-static struct etimer timer;
 
 void client_chunk_handler(coap_message_t *response);
 
-PROCESS(client_ubt, "Re-Mote: Client UBt");
+PROCESS(cli_buzzer, "Zolertia RE-Mote - Client: Piezo Buzzer");
 
 AUTOSTART_PROCESSES(
-    &client_ubt
+    &cli_buzzer
     );
 
-#endif//CLIENT_UBT_H_
+#endif//CLI_BUZZER_H_

@@ -1,5 +1,5 @@
 
-#include "hub-gateway.h"
+#include "cli-reed.h"
 
 #include "dev/button-hal.h"
 
@@ -62,10 +62,8 @@ void client_chunk_handler(coap_message_t *response)
     );
 }
 
-PROCESS_THREAD(hub_gateway, ev, data)
+PROCESS_THREAD(cli_reed, ev, data)
 {
-    static coap_endpoint_t remote_dlock_ep;
-    static coap_endpoint_t remote_buzz_ep;
     static coap_endpoint_t remote_reed_ep;
 
 #ifdef COAP_DTLS_KEYSTORE_CONF_WITH_LWM2M
@@ -74,20 +72,11 @@ PROCESS_THREAD(hub_gateway, ev, data)
 
     PROCESS_BEGIN();
 
-    static coap_message_t request_lock[1];
-    static coap_message_t request_buzz[1];
-
     puts(
-        "Zolertia RE-Mote: Hub Gateway initiated!"
+        "Zolertia RE-Mote: Client - Reed Switch initiated!"
         );
 
     // Endpoint configuration
-    coap_endpoint_parse(
-        REMOTE_LOCK_EP, strlen(REMOTE_LOCK_EP), &remote_dlock_ep
-        );
-    coap_endpoint_parse(
-        REMOTE_BUZZ_EP, strlen(REMOTE_BUZZ_EP), &remote_buzz_ep
-        );
     coap_endpoint_parse(
         REMOTE_REED_EP, strlen(REMOTE_REED_EP), &remote_reed_ep
         );
@@ -96,65 +85,31 @@ PROCESS_THREAD(hub_gateway, ev, data)
         &remote_reed_ep, OBS_RESOURCE_URI, observe_callback, NULL
         );
 
-    if (coap_endpoint_is_secure(&remote_dlock_ep))
+    if (coap_endpoint_is_secure(&remote_reed_ep))
         puts("Confidentiality is protected by DTLS");
     else
         puts("Confidentiality is not protected - DTLS is not enabled!");
     
-    // Connect to remote endpoint
-    coap_endpoint_connect(&remote_dlock_ep);
-    coap_endpoint_connect(&remote_buzz_ep);
-
     // Initialize timer
     etimer_set(
-        &timer, REQUEST_INTERVAL * CLOCK_SECOND
+        &dbg_timer, REQUEST_INTERVAL * CLOCK_SECOND
         );
 
     while (true)
     {
         PROCESS_YIELD();
 
-        // Fallback solution 
-        // to open door lock
         if (ev == button_hal_release_event)
+        {}
+
+        // DBG status information 
+        // in fixed time interval
+        if (etimer_expired(&dbg_timer))
         {
-            // Request GET lock/open
-            coap_init_message(
-                request_lock, COAP_TYPE_CON, COAP_GET, 0
-                );
-            coap_set_header_uri_path(
-                request_lock, remote_urls[1]
-                );
-
-            coap_set_payload(
-                request_lock, NULL, 0
-                );
-
-            COAP_BLOCKING_REQUEST(
-                &remote_dlock_ep, request_lock, client_chunk_handler
-                );
-
-            // Request GET buzz/sound
-            coap_init_message(
-                request_buzz, COAP_TYPE_CON, COAP_GET, 0
-                );
-            coap_set_header_uri_path(
-                request_buzz, remote_urls[2]
-                );
-
-            coap_set_payload(
-                request_buzz, NULL, 0
-                );
-
-            COAP_BLOCKING_REQUEST(
-                &remote_buzz_ep, request_buzz, client_chunk_handler
-                );
+            // Reset timer
+            etimer_reset(&dbg_timer);
         }
     }
     
-    // Disconnect from remote endpoint
-    coap_endpoint_disconnect(&remote_dlock_ep);
-    coap_endpoint_disconnect(&remote_buzz_ep);
-
     PROCESS_END();
 }

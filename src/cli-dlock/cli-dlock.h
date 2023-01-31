@@ -1,6 +1,6 @@
 
-#ifndef HUB_GATEWAY_H_
-#define HUB_GATEWAY_H_
+#ifndef CLI_DLOCK_H_
+#define CLI_DLOCK_H_
 
 #include <string.h>
 
@@ -31,38 +31,17 @@
 
 #ifdef WITH_DTLS
     #define REMOTE_LOCK_EP "coaps://[fe80::212:4b00:abcd:ef00]"
-    #define REMOTE_BUZZ_EP "coaps://[fe80::212:4b00:abcd:ef01]"
-  //#define REMOTE_REED_EP "coaps://[fe80::212:4b00:abcd:ef02]"
 #else
     #define REMOTE_LOCK_EP "coap://[fe80::212:4b00:abcd:ef00]"
-    #define REMOTE_BUZZ_EP "coap://[fe80::212:4b00:abcd:ef01]"
 #endif
 
-#define REMOTE_REED_EP "coap://[fe80::212:4b00:abcd:ef02]"
-
-#define NUMBER_OF_URLS 6
+#define NUMBER_OF_URLS 2
 
 #if LOG_CONF_LEVEL_COAP == LOG_LEVEL_DBG
     #define REQUEST_INTERVAL 10
 #else
     #define REQUEST_INTERVAL 5
 #endif
-
-////////////////////////////////////////////////////////////
-// OBSERVE
-////////////////////////////////////////////////////////////
-
-#define OBS_RESOURCE_URI "reed/status"
-
-static coap_observee_t *observee;
-
-static void observe_callback(
-    coap_observee_t *obs, 
-    void *notification,
-    coap_notification_flag_t flag
-    );
-
-////////////////////////////////////////////////////////////
 
 static struct etimer timer;
 
@@ -71,18 +50,14 @@ char *remote_urls[NUMBER_OF_URLS] =
     ".well-known/core",
     
     "lock/open",
-    "buzz/sound",
-    "buzz/alarm",
-    "buzz/reset",
-    "reed/status",
 };
 
 void client_chunk_handler(coap_message_t *response);
 
-PROCESS(hub_gateway, "Zolertia RE-Mote - Hub Gateway");
+PROCESS(cli_dlock, "Zolertia RE-Mote - Client: Door Lock");
 
 AUTOSTART_PROCESSES(
-    &hub_gateway
+    &cli_dlock
     );
 
-#endif//HUB_GATEWAY_H_
+#endif//CLI_DLOCK_H_

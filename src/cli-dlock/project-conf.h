@@ -4,8 +4,6 @@
 
 #include "../project-conf.common.h"
 
-#define COAP_OBSERVE_CLIENT 1
-
 #define LOG_LEVEL_APP LOG_LEVEL_DBG
 #define LOG_CONF_LEVEL_COAP LOG_LEVEL_DBG
 
