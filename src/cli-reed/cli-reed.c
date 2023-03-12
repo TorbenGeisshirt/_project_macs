@@ -3,9 +3,15 @@
 
 #include "dev/button-hal.h"
 
+#include "../../libjss/jss.h"
+
+#include <string.h>
+
 ////////////////////////////////////////////////////////////
 // OBSERVE
 ////////////////////////////////////////////////////////////
+
+static bool reed_status = false;
 
 static void observe_callback(
     coap_observee_t *obs, 
@@ -25,6 +31,10 @@ static void observe_callback(
             printf("OBSERVE_OK: %*s\n", length, (char*)payload);
             break;
         case NOTIFICATION_OK:
+            reed_status = strstr((char*)payload, "\"reed\": 1")
+                ? true
+                : false;
+
             printf("NOTIFICATION_OK: %*s\n", length, (char*)payload);
             break;
         case OBSERVE_NOT_SUPPORTED:
@@ -106,6 +116,8 @@ PROCESS_THREAD(cli_reed, ev, data)
         // in fixed time interval
         if (etimer_expired(&dbg_timer))
         {
+            printf("Reed-Status: %d\n", reed_status);
+
             // Reset timer
             etimer_reset(&dbg_timer);
         }

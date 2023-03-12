@@ -3,9 +3,13 @@
 
 #include "dev/button-hal.h"
 
+#include "../../libjss/jss.h"
+
 ////////////////////////////////////////////////////////////
 // OBSERVE
 ////////////////////////////////////////////////////////////
+
+static bool reed_open = false;
 
 static void observe_callback(
     coap_observee_t *obs, 
@@ -25,6 +29,10 @@ static void observe_callback(
             printf("OBSERVE_OK: %*s\n", length, (char*)payload);
             break;
         case NOTIFICATION_OK:
+            reed_open = strstr((char*)payload, "\"reed\": 1")
+                ? true
+                : false;
+
             printf("NOTIFICATION_OK: %*s\n", length, (char*)payload);
             break;
         case OBSERVE_NOT_SUPPORTED:
@@ -102,8 +110,8 @@ PROCESS_THREAD(hub_gateway, ev, data)
         puts("Confidentiality is not protected - DTLS is not enabled!");
     
     // Connect to remote endpoint
-    coap_endpoint_connect(&remote_dlock_ep);
     coap_endpoint_connect(&remote_buzz_ep);
+    coap_endpoint_connect(&remote_dlock_ep);
 
     // Initialize timer
     etimer_set(
@@ -112,7 +120,7 @@ PROCESS_THREAD(hub_gateway, ev, data)
 
     while (true)
     {
-        PROCESS_YIELD();
+        PROCESS_WAIT_EVENT();
 
         // Fallback solution 
         // to open door lock
@@ -134,6 +142,8 @@ PROCESS_THREAD(hub_gateway, ev, data)
                 &remote_dlock_ep, request_lock, client_chunk_handler
                 );
 
+            PROCESS_PAUSE();
+
             // Request GET buzz/sound
             coap_init_message(
                 request_buzz, COAP_TYPE_CON, COAP_GET, 0
@@ -149,6 +159,14 @@ PROCESS_THREAD(hub_gateway, ev, data)
             COAP_BLOCKING_REQUEST(
                 &remote_buzz_ep, request_buzz, client_chunk_handler
                 );
+        }
+
+        if (etimer_expired(&timer))
+        {
+            printf("Reed-Status: %d\n", reed_open);
+
+            // Reset timer
+            etimer_reset(&timer);
         }
     }
     

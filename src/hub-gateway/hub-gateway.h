@@ -29,13 +29,13 @@
 #define LOG_MODULE "App"
 #define LOG_LEVEL LOG_LEVEL_COAP
 
-#ifdef WITH_DTLS
-    #define REMOTE_LOCK_EP "coaps://[fe80::212:4b00:abcd:ef00]"
-    #define REMOTE_BUZZ_EP "coaps://[fe80::212:4b00:abcd:ef01]"
+#ifdef _WITH_DTLS
+    #define REMOTE_LOCK_EP "coaps://[fe80::212:4b00:abcd:ef05]"
+    #define REMOTE_BUZZ_EP "coaps://[fe80::212:4b00:abcd:ef07]"
   //#define REMOTE_REED_EP "coaps://[fe80::212:4b00:abcd:ef02]"
 #else
-    #define REMOTE_LOCK_EP "coap://[fe80::212:4b00:abcd:ef00]"
-    #define REMOTE_BUZZ_EP "coap://[fe80::212:4b00:abcd:ef01]"
+    #define REMOTE_LOCK_EP "coap://[fe80::212:4b00:abcd:ef05]"
+    #define REMOTE_BUZZ_EP "coap://[fe80::212:4b00:abcd:ef07]"
 #endif
 
 #define REMOTE_REED_EP "coap://[fe80::212:4b00:abcd:ef02]"

@@ -5,7 +5,7 @@
 #include "dev/gpio.h"
 
 #define GPIO_A_NUM          0
-#define BUZZ_PIN_MASK       GPIO_PIN_MASK(5)
+#define BUZZ_PIN_MASK       GPIO_PIN_MASK(2)
 #define GPIO_A_PORT_BASE    GPIO_PORT_TO_BASE(GPIO_A_NUM)
 
 ////////////////////////////////////////////////////////////
@@ -152,17 +152,20 @@ PROCESS_THREAD(rm_buzzer, ev, data)
 
         if (stimer_expired(&buzz_timer))
         {
+            /*
             if (!buzz_alarm)
                 buzz_enabled = false;
             else
             {
-                buzz_enabled = !buzz_enabled;
-                
+            */
+                buzz_enabled = false;
+            /*
                 // Reset buzz timer
                 stimer_reset(
                     &buzz_timer
                     );
             }
+            */
         }
 
         // DBG status information 
